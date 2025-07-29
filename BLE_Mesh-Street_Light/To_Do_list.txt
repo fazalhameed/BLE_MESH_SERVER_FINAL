@@ -1,0 +1,10 @@
+1.  Addition of vendor models on street light server model which include followings.
+    1.1 Street light power PWM control and read.(0-100%).
+    1.2 Street light Power timeout(0-86400 seconds equals to 24 hours) 
+    1.3 Battery power read(0-100%)
+    1.4 instant Power reading
+    1.5 life time power consumed reading
+    1.6 Solar Power produced reading.
+    1.7 instant voltage reading
+    1.8 instant current reading.
+ 

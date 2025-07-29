@@ -1,4 +1,4 @@
-/* * Data converted from D:/ESP-IDF-Project-WorkSpace/BLE_test/build/esp-idf/mbedtls/x509_crt_bundle
+/* * Data converted from D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light/build/esp-idf/mbedtls/x509_crt_bundle
  */
 .data
 #if !defined (__APPLE__) && !defined (__linux__)

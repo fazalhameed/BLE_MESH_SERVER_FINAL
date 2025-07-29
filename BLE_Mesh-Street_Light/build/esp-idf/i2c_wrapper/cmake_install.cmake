@@ -1,4 +1,4 @@
-# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_test/components/i2c_wrapper
+# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light/components/i2c_wrapper
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

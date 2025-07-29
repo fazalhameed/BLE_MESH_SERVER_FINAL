@@ -1,4 +1,4 @@
-# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_test/main
+# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light/main
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

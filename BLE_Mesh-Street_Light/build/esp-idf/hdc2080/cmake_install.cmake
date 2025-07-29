@@ -1,4 +1,4 @@
-# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_test/components/hdc2080
+# Install script for directory: D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light/components/hdc2080
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

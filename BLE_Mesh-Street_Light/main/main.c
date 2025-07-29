@@ -337,7 +337,6 @@ static esp_err_t ble_mesh_init(void)
 // void HDC_task(){        
 // float temperature= 0.0f,  humidity = 0.0f;
 
-
 //     esp_err_t err = hdc2080_begin(i2c_bus_handle, &mst_dev_handle, HDC2080_ADDR);
 //     if (err == ESP_OK) {
 //         printf("HDC2080 sensor found\n");

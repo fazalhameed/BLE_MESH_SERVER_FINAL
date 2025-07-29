@@ -1,15 +1,21 @@
 {
   "C_Cpp.intelliSenseEngine": "default",
-  "idf.espIdfPathWin": "C:\\Users\\Zi\\esp\\v5.4\\esp-idf",
-  "idf.pythonInstallPath": "C:\\Espressif\\tools\\idf-python\\3.11.2\\python.exe",
+  "idf.espIdfPathWin": "d:\\ESP32\\esp\\v5.4\\esp-idf",
+  "idf.pythonInstallPath": "d:\\ESP32\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
   "idf.openOcdConfigs": [
-    "interface/ftdi/esp32_devkitj_v1.cfg",
-    "target/esp32.cfg"
+    "board/esp32-wrover-kit-3.3v.cfg"
   ],
-  "idf.portWin": "COM20",
-  "idf.toolsPathWin": "C:\\Espressif",
+  "idf.portWin": "COM2",
+  "idf.toolsPathWin": "d:\\ESP32\\.espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
   },
-  "idf.flashType": "UART"
+  "idf.flashType": "UART",
+  "files.associations": {
+    "esp_ble_mesh_sensor_model_api.h": "c",
+    "esp_ble_mesh_generic_model_api.h": "c",
+    "esp_ble_mesh_config_model_api.h": "c",
+    "board.h": "c",
+    "esp_ble_mesh_local_data_operation_api.h": "c"
+  }
 }

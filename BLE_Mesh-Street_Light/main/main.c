@@ -1,12 +1,3 @@
-/* main.c - Application main entry point */
-
-/*
- * SPDX-FileCopyrightText: 2017 Intel Corporation
- * SPDX-FileContributor: 2018-2021 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
@@ -380,7 +371,7 @@ void app_main(void)
 
     board_init();
 
-    i2c_master_bus_config_t i2c_mst_config = {
+    i2c_master_bus_config_t i2c_mst_config = { 
 		.clk_source = I2C_CLK_SRC_DEFAULT,
 		.glitch_ignore_cnt = 7,
 		.i2c_port = I2C_NUM,

@@ -1,12 +1,3 @@
-/* main.c - Application main entry point */
-
-/*
- * SPDX-FileCopyrightText: 2017 Intel Corporation
- * SPDX-FileContributor: 2018-2021 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
@@ -21,12 +12,16 @@
 #include "esp_ble_mesh_config_model_api.h"
 #include "esp_ble_mesh_generic_model_api.h"
 #include "esp_ble_mesh_local_data_operation_api.h"
-
 #include "board.h"
 #include "ble_mesh_example_init.h"
 
 #include "hdc2080.h"
 #include "i2c_wrapper.h"
+#include "driver/ledc.h"
+
+
+
+
 #define TAG "EXAMPLE"
 
 #define CID_ESP 0x02E5
@@ -372,6 +367,9 @@ static esp_err_t ble_mesh_init(void)
 //          vTaskDelay(pdMS_TO_TICKS(5000));  // Read every 5 seconds
 //     }
 // }
+
+
+
 void app_main(void)
 {
     esp_err_t err;
@@ -379,17 +377,21 @@ void app_main(void)
     ESP_LOGI(TAG, "Initializing...");
 
     board_init();
+    pwm_init();
+       board_led_set_brightness(480);
+       
 
-    i2c_master_bus_config_t i2c_mst_config = {
-		.clk_source = I2C_CLK_SRC_DEFAULT,
-		.glitch_ignore_cnt = 7,
-		.i2c_port = I2C_NUM,
-		.scl_io_num =  22,
-		.sda_io_num =  21,
-		.flags.enable_internal_pullup = true,
-	};
+
+    // i2c_master_bus_config_t i2c_mst_config = { 
+	// 	.clk_source = I2C_CLK_SRC_DEFAULT,
+	// 	.glitch_ignore_cnt = 7,
+	// 	.i2c_port = I2C_NUM,
+	// 	.scl_io_num =  22,
+	// 	.sda_io_num =  21,
+	// 	.flags.enable_internal_pullup = true,
+	// };
    
-	ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_mst_config, &i2c_bus_handle));
+	// ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_mst_config, &i2c_bus_handle));
      
     err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
@@ -414,8 +416,17 @@ void app_main(void)
     ESP_LOGI(TAG, "Bluetooth Mesh initialized");
     // HDC_task();
     // ESP_LOGI(TAG, "HDC2080 task started");
-    // while (1) { 
-    //     vTaskDelay(pdMS_TO_TICKS(1000));  // Main loop delay
-    // }
+    while (1) { 
+         for (int duty = 0; duty <= 1023; duty += 64) {
+            board_led_set_brightness(duty);
+           
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+        for (int duty = 1023; duty >= 0; duty -= 64) {
+            board_led_set_brightness(duty);
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    //    // vTaskDelay(pdMS_TO_TICKS(1000));  // Main loop delay
+    }
     
 }

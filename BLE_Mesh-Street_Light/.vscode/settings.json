@@ -6,10 +6,14 @@
     "interface/ftdi/esp32_devkitj_v1.cfg",
     "target/esp32.cfg"
   ],
-  "idf.portWin": "COM43",
+  "idf.portWin": "COM28",
   "idf.toolsPathWin": "C:\\Espressif",
   "idf.customExtraVars": {
     "IDF_TARGET": "esp32"
   },
-  "idf.flashType": "UART"
+  "idf.flashType": "UART",
+  "files.associations": {
+    "ledc.h": "c",
+    "hdc2080.h": "c"
+  }
 }

@@ -1,7 +1,7 @@
 {
     "version":            "1.1",
     "project_name":       "BLE_test",
-    "project_version":    "338a1af-dirty",
+    "project_version":    "7acfd54-dirty",
     "project_path":       "D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light",
     "idf_path":           "C:/Users/Zi/esp/v5.4/esp-idf",
     "build_dir":          "D:/ESP-IDF-Project-WorkSpace/BLE_Mesh_Server/BLE_Mesh-Street_Light/build",

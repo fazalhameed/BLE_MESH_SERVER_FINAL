@@ -11462,7 +11462,10 @@
                                 "help": "This option specifies how many unprovisioned devices can be added to device\nqueue for provisioning. Users can use this option to define the size of the\nqueue in the bottom layer which is used to store unprovisioned device\ninformation (e.g. Device UUID, address).",
                                 "id": "BLE_MESH_WAIT_FOR_PROV_MAX_DEV_NUM",
                                 "name": "BLE_MESH_WAIT_FOR_PROV_MAX_DEV_NUM",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    100
+                                ],
                                 "title": "Maximum number of unprovisioned devices that can be added to device queue",
                                 "type": "int"
                             },
@@ -11472,7 +11475,10 @@
                                 "help": "This option specifies how many devices can be provisioned by a Provisioner.\nThis value indicates the maximum number of unprovisioned devices which can be\nprovisioned by a Provisioner. For instance, if the value is 6, it means the\nProvisioner can provision up to 6 unprovisioned devices.\nTheoretically a Provisioner without the limitation of its memory can provision\nup to 32766 unprovisioned devices, here we limit the maximum number to 100\njust to limit the memory used by a Provisioner. The bigger the value is, the\nmore memory it will cost by a Provisioner to store the information of nodes.",
                                 "id": "BLE_MESH_MAX_PROV_NODES",
                                 "name": "BLE_MESH_MAX_PROV_NODES",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    1000
+                                ],
                                 "title": "Maximum number of devices that can be provisioned by Provisioner",
                                 "type": "int"
                             },
@@ -11482,7 +11488,10 @@
                                 "help": "This option specifies how many devices can be provisioned at the same time\nusing PB-ADV. For examples, if the value is 2, it means a Provisioner can\nprovision two unprovisioned devices with PB-ADV at the same time.",
                                 "id": "BLE_MESH_PBA_SAME_TIME",
                                 "name": "BLE_MESH_PBA_SAME_TIME",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    10
+                                ],
                                 "title": "Maximum number of PB-ADV running at the same time by Provisioner",
                                 "type": "int"
                             },
@@ -11492,7 +11501,10 @@
                                 "help": "This option specifies how many devices can be provisioned at the same\ntime using PB-GATT. For example, if the value is 2, it means a Provisioner\ncan provision two unprovisioned devices with PB-GATT at the same time.",
                                 "id": "BLE_MESH_PBG_SAME_TIME",
                                 "name": "BLE_MESH_PBG_SAME_TIME",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    5
+                                ],
                                 "title": "Maximum number of PB-GATT running at the same time by Provisioner",
                                 "type": "int"
                             },
@@ -11502,7 +11514,10 @@
                                 "help": "This option specifies how many subnets per network a Provisioner can create.\nIndeed, this value decides the number of network keys which can be added by a Provisioner.",
                                 "id": "BLE_MESH_PROVISIONER_SUBNET_COUNT",
                                 "name": "BLE_MESH_PROVISIONER_SUBNET_COUNT",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    4096
+                                ],
                                 "title": "Maximum number of mesh subnets that can be created by Provisioner",
                                 "type": "int"
                             },
@@ -11512,7 +11527,10 @@
                                 "help": "This option specifies how many application keys the Provisioner can have.\nIndeed, this value decides the number of the application keys which can be added by a Provisioner.",
                                 "id": "BLE_MESH_PROVISIONER_APP_KEY_COUNT",
                                 "name": "BLE_MESH_PROVISIONER_APP_KEY_COUNT",
-                                "range": null,
+                                "range": [
+                                    1,
+                                    4096
+                                ],
                                 "title": "Maximum number of application keys that can be owned by Provisioner",
                                 "type": "int"
                             },
@@ -11750,7 +11768,10 @@
                                 "help": "This value defines in seconds how soon any pending changes are actually\nwritten into persistent storage (flash) after a change occurs.\nThe option allows nodes to delay a certain period of time to save proper\ninformation to flash. The default value is 0, which means information\nwill be stored immediately once there are updates.",
                                 "id": "BLE_MESH_STORE_TIMEOUT",
                                 "name": "BLE_MESH_STORE_TIMEOUT",
-                                "range": null,
+                                "range": [
+                                    0,
+                                    1000000
+                                ],
                                 "title": "Delay (in seconds) before storing anything persistently",
                                 "type": "int"
                             },
@@ -11760,7 +11781,10 @@
                                 "help": "This value defines how often the local sequence number gets updated in\npersistent storage (i.e. flash). e.g. a value of 100 means that the\nsequence number will be stored to flash on every 100th increment.\nIf the node sends messages very frequently a higher value makes more\nsense, whereas if the node sends infrequently a value as low as 0\n(update storage for every increment) can make sense. When the stack\ngets initialized it will add sequence number to the last stored one,\nso that it starts off with a value that's guaranteed to be larger than\nthe last one used before power off.",
                                 "id": "BLE_MESH_SEQ_STORE_RATE",
                                 "name": "BLE_MESH_SEQ_STORE_RATE",
-                                "range": null,
+                                "range": [
+                                    0,
+                                    1000000
+                                ],
                                 "title": "How often the sequence number gets updated in storage",
                                 "type": "int"
                             },
@@ -11770,7 +11794,10 @@
                                 "help": "This value defines in seconds how soon the RPL (Replay Protection List)\ngets written to persistent storage after a change occurs. If the node\nreceives messages frequently, then a large value is recommended. If the\nnode receives messages rarely, then the value can be as low as 0 (which\nmeans the RPL is written into the storage immediately).\nNote that if the node operates in a security-sensitive case, and there is\na risk of sudden power-off, then a value of 0 is strongly recommended.\nOtherwise, a power loss before RPL being written into the storage may\nintroduce message replay attacks and system security will be in a\nvulnerable state.",
                                 "id": "BLE_MESH_RPL_STORE_TIMEOUT",
                                 "name": "BLE_MESH_RPL_STORE_TIMEOUT",
-                                "range": null,
+                                "range": [
+                                    0,
+                                    1000000
+                                ],
                                 "title": "Minimum frequency that the RPL gets updated in storage",
                                 "type": "int"
                             },

@@ -380,8 +380,6 @@ void app_main(void)
     pwm_init();
        board_led_set_brightness(480);
        
-
-
     // i2c_master_bus_config_t i2c_mst_config = { 
 	// 	.clk_source = I2C_CLK_SRC_DEFAULT,
 	// 	.glitch_ignore_cnt = 7,

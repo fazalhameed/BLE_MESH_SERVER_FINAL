@@ -1,11 +1,5 @@
 /* board.c - Board-specific hooks */
 
-/*
- * SPDX-FileCopyrightText: 2017 Intel Corporation
- * SPDX-FileContributor: 2018-2021 Espressif Systems (Shanghai) CO LTD
- *
- * SPDX-License-Identifier: Apache-2.0
- */
 
 #include <stdio.h>
 
@@ -79,6 +73,13 @@ void board_led_operation(uint8_t pin, uint8_t onoff)
         // ledc_update_duty(LEDC_LOW_SPEED_MODE, i);
          gpio_set_level(pin, onoff);
         led_state[i].previous = onoff;
+
+           // Control PWM brightness together with LED
+        if (onoff) {
+            board_led_set_brightness(1023);  // Full brightness
+        } else {
+            board_led_set_brightness(0);     // Turn off PWM
+        }
         return;
     }
 
@@ -101,4 +102,5 @@ static void board_led_init(void)
 void board_init(void)
 {
     board_led_init();
+    pwm_init();
 }

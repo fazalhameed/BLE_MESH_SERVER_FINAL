@@ -19,11 +19,7 @@
 #include "i2c_wrapper.h"
 #include "driver/ledc.h"
 
-
-
-
 #define TAG "EXAMPLE"
-
 #define CID_ESP 0x02E5
 
 extern struct _led_state led_state[3];
@@ -127,13 +123,14 @@ static void example_change_led_state(esp_ble_mesh_model_t *model,
                                      esp_ble_mesh_msg_ctx_t *ctx, uint8_t onoff)
 {
     uint16_t primary_addr = esp_ble_mesh_get_primary_element_address();
-    uint8_t elem_count = esp_ble_mesh_get_element_count();
+   // uint8_t elem_count = esp_ble_mesh_get_element_count();
     struct _led_state *led = NULL;
-    uint8_t i;
+    //uint8_t i;
     
     if (ESP_BLE_MESH_ADDR_IS_UNICAST(ctx->recv_dst)) {
         led = &led_state[model->element->element_addr - primary_addr];
-        board_led_operation(led->pin, onoff);
+        board_led_operation(led->pin, onoff);   
+        board_led_set_brightness(onoff ? 1023 : 0);  // Add this line
         ESP_LOGI(TAG, "Toggling LED on GPIO %d to %s", led->pin, onoff ? "ON" : "OFF");
 
         // for (i = 0; i < elem_count; i++) {
@@ -147,11 +144,14 @@ static void example_change_led_state(esp_ble_mesh_model_t *model,
     
             ESP_LOGI("ONOF_CHECK", "Model subscribed to group 0x%04x", ctx->recv_dst);
             led = &led_state[model->element->element_addr - primary_addr];
-            board_led_operation(led->pin, onoff);
+            board_led_operation(led->pin, onoff);     
+            board_led_set_brightness(onoff ? 1023 : 0);  // Add this line
+            ESP_LOGI("ONOFF_CHECK", "Group 0x%04x toggled LED and PWM", ctx->recv_dst);
         }
     } else if (ctx->recv_dst == 0xFFFF) {
         led = &led_state[model->element->element_addr - primary_addr];
-        board_led_operation(led->pin, onoff);
+        board_led_operation(led->pin, onoff);  
+        board_led_set_brightness(onoff ? 1023 : 0);  // Add this line 
     }
     else{
         ESP_LOGE(TAG, "Invalid destination address: 0x%04x", ctx->recv_dst);
@@ -377,9 +377,7 @@ void app_main(void)
     ESP_LOGI(TAG, "Initializing...");
 
     board_init();
-    pwm_init();
-       board_led_set_brightness(480);
-       
+    
     // i2c_master_bus_config_t i2c_mst_config = { 
 	// 	.clk_source = I2C_CLK_SRC_DEFAULT,
 	// 	.glitch_ignore_cnt = 7,
@@ -414,17 +412,17 @@ void app_main(void)
     ESP_LOGI(TAG, "Bluetooth Mesh initialized");
     // HDC_task();
     // ESP_LOGI(TAG, "HDC2080 task started");
+    
     while (1) { 
-         for (int duty = 0; duty <= 1023; duty += 64) {
-            board_led_set_brightness(duty);
-           
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-        for (int duty = 1023; duty >= 0; duty -= 64) {
+         for (int duty = 0; duty <= 1023; duty += 110) {
             board_led_set_brightness(duty);
             vTaskDelay(pdMS_TO_TICKS(100));
         }
-    //    // vTaskDelay(pdMS_TO_TICKS(1000));  // Main loop delay
+        for (int duty = 1023; duty >= 0; duty -= 110) {
+            board_led_set_brightness(duty);
+            vTaskDelay(pdMS_TO_TICKS(100));
+        }
+    
     }
     
 }

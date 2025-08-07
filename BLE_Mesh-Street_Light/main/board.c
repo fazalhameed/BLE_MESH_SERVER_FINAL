@@ -8,16 +8,10 @@
 #include "board.h"
 #include "driver/ledc.h"
 #include <inttypes.h> 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #define TAG "BOARD"
-
-
-#define LED_PWM_GPIO       4     
-#define LED_PWM_FREQ       5000                         // 5 kHz
-#define LED_PWM_RESOLUTION LEDC_TIMER_10_BIT            // 10-bit resolution
-#define LED_PWM_CHANNEL    LEDC_CHANNEL_0
-#define LED_PWM_TIMER      LEDC_TIMER_0
-#define LED_PWM_MODE       LEDC_LOW_SPEED_MODE
 
 struct _led_state led_state[3] = {
     { LED_OFF, LED_OFF, LED_R, "red"   },
@@ -48,7 +42,7 @@ void pwm_init(void) {
     ledc_timer_config(&ledc_timer);
 
     ledc_channel_config_t ledc_channel = {
-        .gpio_num       = LED_PWM_GPIO,
+        .gpio_num       = LED_B,
         .speed_mode     = LED_PWM_MODE,
         .channel        = LED_PWM_CHANNEL,
         .timer_sel      = LED_PWM_TIMER,
@@ -56,7 +50,7 @@ void pwm_init(void) {
         .hpoint         = 0
     };
     ledc_channel_config(&ledc_channel);
-     ESP_LOGI(TAG, "PWM initialized on GPIO %d", LED_PWM_GPIO);
+     ESP_LOGI(TAG, "PWM initialized on GPIO %d",LED_B);
 }
 void board_led_operation(uint8_t pin, uint8_t onoff)
 {
@@ -69,30 +63,36 @@ void board_led_operation(uint8_t pin, uint8_t onoff)
                      led_state[i].name, (onoff ? "on" : "off"));
             return;
         }
-        // ledc_set_duty(LEDC_LOW_SPEED_MODE, i, onoff ? 1023 : 0);
-        // ledc_update_duty(LEDC_LOW_SPEED_MODE, i);
-         gpio_set_level(pin, onoff);
+        //gpio_set_level(pin, onoff);
         led_state[i].previous = onoff;
 
-           // Control PWM brightness together with LED
-        if (onoff) {
-            board_led_set_brightness(1023);  // Full brightness
-        } else {
-            board_led_set_brightness(0);     // Turn off PWM
-        }
+        if (pin == LED_B) {
+            if (onoff) {
+                for (int duty = 0; duty <= 1023; duty += 64) {
+                    board_led_set_brightness(duty);
+                    vTaskDelay(pdMS_TO_TICKS(20));
+                }
+            } else {
+                for (int duty = 1023; duty >= 0; duty -= 64) {
+                    board_led_set_brightness(duty);
+                    vTaskDelay(pdMS_TO_TICKS(20));
+                }
+            }
+        }else {
+                // For Red or Green, just toggle GPIO
+                gpio_set_level(pin, onoff);
+            }
+
+        ESP_LOGI(TAG, "LED %s turned %s", led_state[i].name, onoff ? "ON" : "OFF");
         return;
     }
-
     ESP_LOGE(TAG, "LED is not found!");
 }
 
 static void board_led_init(void)
 {
     for (int i = 0; i < 3; i++) {
-        gpio_reset_pin(led_state[i].pin);
-        // board_led_pwm_init(led_state[i].pin, i); // i == LEDC_CHANNEL_0, _1, _2
-        // ledc_set_duty(LEDC_LOW_SPEED_MODE, i, 0);
-        // ledc_update_duty(LEDC_LOW_SPEED_MODE, i);
+        gpio_reset_pin(led_state[i].pin);   
         gpio_set_direction(led_state[i].pin, GPIO_MODE_OUTPUT);
         gpio_set_level(led_state[i].pin, LED_OFF);
         led_state[i].previous = LED_OFF;

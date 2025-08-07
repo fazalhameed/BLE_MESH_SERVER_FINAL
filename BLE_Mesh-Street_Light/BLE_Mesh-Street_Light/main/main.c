@@ -1,3 +1,5 @@
+/* main.c - Application main entry point */
+
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
@@ -12,18 +14,18 @@
 #include "esp_ble_mesh_config_model_api.h"
 #include "esp_ble_mesh_generic_model_api.h"
 #include "esp_ble_mesh_local_data_operation_api.h"
+
 #include "board.h"
 #include "ble_mesh_example_init.h"
 
 #include "hdc2080.h"
 #include "i2c_wrapper.h"
-#include "driver/ledc.h"
-
 #define TAG "EXAMPLE"
+
 #define CID_ESP 0x02E5
 
 extern struct _led_state led_state[3];
-static bool is_node_on = false;  // Global flag to track node ON/OFF
+
 static uint8_t dev_uuid[16] = { 0xdd, 0xdd };
 
 i2c_master_bus_handle_t i2c_bus_handle = NULL;
@@ -36,6 +38,7 @@ static esp_ble_mesh_cfg_srv_t config_server = {
     .relay = ESP_BLE_MESH_RELAY_ENABLED,
     .relay_retransmit = ESP_BLE_MESH_TRANSMIT(2, 20),
     .beacon = ESP_BLE_MESH_BEACON_ENABLED,
+    
 #if defined(CONFIG_BLE_MESH_GATT_PROXY_SERVER)
     .gatt_proxy = ESP_BLE_MESH_GATT_PROXY_ENABLED,
 #else
@@ -123,14 +126,13 @@ static void example_change_led_state(esp_ble_mesh_model_t *model,
                                      esp_ble_mesh_msg_ctx_t *ctx, uint8_t onoff)
 {
     uint16_t primary_addr = esp_ble_mesh_get_primary_element_address();
-   // uint8_t elem_count = esp_ble_mesh_get_element_count();
+    uint8_t elem_count = esp_ble_mesh_get_element_count();
     struct _led_state *led = NULL;
-    //uint8_t i;
+    uint8_t i;
     
     if (ESP_BLE_MESH_ADDR_IS_UNICAST(ctx->recv_dst)) {
         led = &led_state[model->element->element_addr - primary_addr];
-        board_led_operation(led->pin, onoff);   
-       
+        board_led_operation(led->pin, onoff);
         ESP_LOGI(TAG, "Toggling LED on GPIO %d to %s", led->pin, onoff ? "ON" : "OFF");
 
         // for (i = 0; i < elem_count; i++) {
@@ -144,12 +146,11 @@ static void example_change_led_state(esp_ble_mesh_model_t *model,
     
             ESP_LOGI("ONOF_CHECK", "Model subscribed to group 0x%04x", ctx->recv_dst);
             led = &led_state[model->element->element_addr - primary_addr];
-            board_led_operation(led->pin, onoff);        
-            ESP_LOGI("ONOFF_CHECK", "Group 0x%04x toggled LED and PWM", ctx->recv_dst);
+            board_led_operation(led->pin, onoff);
         }
     } else if (ctx->recv_dst == 0xFFFF) {
         led = &led_state[model->element->element_addr - primary_addr];
-        board_led_operation(led->pin, onoff);  
+        board_led_operation(led->pin, onoff);
     }
     else{
         ESP_LOGE(TAG, "Invalid destination address: 0x%04x", ctx->recv_dst);
@@ -222,7 +223,6 @@ static void example_ble_mesh_provisioning_cb(esp_ble_mesh_prov_cb_event_t event,
     }
 }
 
-
 static void example_ble_mesh_generic_server_cb(esp_ble_mesh_generic_server_cb_event_t event,
                                                esp_ble_mesh_generic_server_cb_param_t *param)
 {
@@ -232,7 +232,7 @@ static void example_ble_mesh_generic_server_cb(esp_ble_mesh_generic_server_cb_ev
 
     switch (event) {
     case ESP_BLE_MESH_GENERIC_SERVER_STATE_CHANGE_EVT:
-        ESP_LOGI(TAG, "State Change Event Received/Button Press");
+        ESP_LOGI(TAG, "Button Press");
         example_change_led_state(param->model, &param->ctx, param->value.state_change.onoff_set.onoff);
         if (param->ctx.recv_op == ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
             param->ctx.recv_op == ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
@@ -244,11 +244,7 @@ static void example_ble_mesh_generic_server_cb(esp_ble_mesh_generic_server_cb_ev
         ESP_LOGI(TAG, "ESP_BLE_MESH_GENERIC_SERVER_RECV_GET_MSG_EVT");
         if (param->ctx.recv_op == ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_GET) {
             srv = (esp_ble_mesh_gen_onoff_srv_t *)param->model->user_data;
-
-            uint8_t onoff = param->value.state_change.onoff_set.onoff;
-            is_node_on = (onoff == 1);
             ESP_LOGI(TAG, "onoff 0x%02x", srv->state.onoff);
-
             example_handle_gen_onoff_msg(param->model, &param->ctx, NULL);
         }
         break;
@@ -256,19 +252,11 @@ static void example_ble_mesh_generic_server_cb(esp_ble_mesh_generic_server_cb_ev
         ESP_LOGI(TAG, "ESP_BLE_MESH_GENERIC_SERVER_RECV_SET_MSG_EVT");
         if (param->ctx.recv_op == ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_SET ||
             param->ctx.recv_op == ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_SET_UNACK) {
-                
-            uint8_t onoff = param->value.set.onoff.onoff;
-            is_node_on = (onoff == 1);
-
-            ESP_LOGI(TAG, "onoff 0x%02x, tid 0x%02x", param->value.set.onoff.onoff, 
-                    param->value.set.onoff.tid);
-
+            ESP_LOGI(TAG, "onoff 0x%02x, tid 0x%02x", param->value.set.onoff.onoff, param->value.set.onoff.tid);
             if (param->value.set.onoff.op_en) {
                 ESP_LOGI(TAG, "trans_time 0x%02x, delay 0x%02x",
-                    param->value.set.onoff.trans_time, 
-                    param->value.set.onoff.delay);
+                    param->value.set.onoff.trans_time, param->value.set.onoff.delay);
             }
-            
             example_handle_gen_onoff_msg(param->model, &param->ctx, &param->value.set.onoff);
         }
         break;
@@ -343,6 +331,7 @@ static esp_err_t ble_mesh_init(void)
 // void HDC_task(){        
 // float temperature= 0.0f,  humidity = 0.0f;
 
+
 //     esp_err_t err = hdc2080_begin(i2c_bus_handle, &mst_dev_handle, HDC2080_ADDR);
 //     if (err == ESP_OK) {
 //         printf("HDC2080 sensor found\n");
@@ -379,8 +368,6 @@ static esp_err_t ble_mesh_init(void)
 //     }
 // }
 
-
-
 void app_main(void)
 {
     esp_err_t err;
@@ -388,17 +375,17 @@ void app_main(void)
     ESP_LOGI(TAG, "Initializing...");
 
     board_init();
-    
-    // i2c_master_bus_config_t i2c_mst_config = { 
-	// 	.clk_source = I2C_CLK_SRC_DEFAULT,
-	// 	.glitch_ignore_cnt = 7,
-	// 	.i2c_port = I2C_NUM,
-	// 	.scl_io_num =  22,
-	// 	.sda_io_num =  21,
-	// 	.flags.enable_internal_pullup = true,
-	// };
+
+    i2c_master_bus_config_t i2c_mst_config = {
+		.clk_source = I2C_CLK_SRC_DEFAULT,
+		.glitch_ignore_cnt = 7,
+		.i2c_port = I2C_NUM,
+		.scl_io_num =  22,
+		.sda_io_num =  21,
+		.flags.enable_internal_pullup = true,
+	};
    
-	// ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_mst_config, &i2c_bus_handle));
+	ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_mst_config, &i2c_bus_handle));
      
     err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
@@ -423,17 +410,8 @@ void app_main(void)
     ESP_LOGI(TAG, "Bluetooth Mesh initialized");
     // HDC_task();
     // ESP_LOGI(TAG, "HDC2080 task started");
-    
-    while (1) { 
-         for (int duty = 0; duty <= 1023; duty += 64) {
-            board_led_set_brightness(duty);
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-        for (int duty = 1023; duty >= 0; duty -= 64) {
-            board_led_set_brightness(duty);
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-    
-   }
+    // while (1) { 
+    //     vTaskDelay(pdMS_TO_TICKS(1000));  // Main loop delay
+    // }
     
 }

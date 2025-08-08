@@ -24,9 +24,9 @@ extern "C" {
 #define LED_PWM_MODE       LEDC_LOW_SPEED_MODE
 
 #if defined(CONFIG_BLE_MESH_ESP_WROOM_32)
-#define LED_R GPIO_NUM_2
-#define LED_G GPIO_NUM_2
-#define LED_B GPIO_NUM_4
+#define LED_R GPIO_NUM_4
+#define LED_G GPIO_NUM_4
+#define LED_B GPIO_NUM_22
   
 #elif defined(CONFIG_BLE_MESH_ESP_WROVER)
 #define LED_R GPIO_NUM_0

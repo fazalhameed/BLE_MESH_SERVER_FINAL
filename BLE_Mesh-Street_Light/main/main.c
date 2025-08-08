@@ -424,16 +424,17 @@ void app_main(void)
     // HDC_task();
     // ESP_LOGI(TAG, "HDC2080 task started");
     
-    while (1) { 
-         for (int duty = 0; duty <= 1023; duty += 64) {
-            board_led_set_brightness(duty);
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
-        for (int duty = 1023; duty >= 0; duty -= 64) {
-            board_led_set_brightness(duty);
-            vTaskDelay(pdMS_TO_TICKS(100));
-        }
+//     while (1) { 
+//         board_led_operation();
+//         //  for (int duty = 0; duty <= 1023; duty += 64) {
+//         //     board_led_set_brightness(duty);
+//         //     vTaskDelay(pdMS_TO_TICKS(100));
+//         // }
+//         // for (int duty = 1023; duty >= 0; duty -= 64) {
+//         //     board_led_set_brightness(duty);
+//         //     vTaskDelay(pdMS_TO_TICKS(100));
+//         // }
     
-   }
+//    }
     
 }

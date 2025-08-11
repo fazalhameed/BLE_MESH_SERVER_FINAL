@@ -73,11 +73,11 @@ void led_fade_task(void *param) {
 
 for (int cycle = 0; cycle < FADE_CYCLES; cycle++) {
     // Fade up
-    ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, LED_MAX_DUTY, 500); // 500ms
+    ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, LED_MAX_DUTY, 1000); // 500ms
     ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
 
     // Fade down
-    ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, 0, 500);
+    ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, 0, 1000);
     ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
 }
     // Ensure LED is fully off

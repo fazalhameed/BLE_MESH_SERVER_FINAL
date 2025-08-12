@@ -341,20 +341,21 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
             if (param->model_operation.length >= 2) {
                 tid = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
             }
-            ESP_LOGI(TAG, "Vendor op SEND recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
+            ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
 
             /* Example: send a vendor status back (echo tid) */
             esp_err_t err = esp_ble_mesh_server_model_send_msg(param->model_operation.model,
                 param->model_operation.ctx, ESP_BLE_MESH_VND_MODEL_OP_STATUS,
                 sizeof(tid), (uint8_t *)&tid);
             if (err) {
-                ESP_LOGE(TAG, "Failed to send vendor status (err %d)", err);
+                ESP_LOGE(TAG, "Failed to send vendor model status (err %d)", err);
             }
         }
     } else if (event == ESP_BLE_MESH_MODEL_SEND_COMP_EVT) {
         ESP_LOGI(TAG, "Vendor model send complete (err %d)", param->model_send_comp.err_code);
     }
 }
+
 
 static esp_err_t ble_mesh_init(void)
 {

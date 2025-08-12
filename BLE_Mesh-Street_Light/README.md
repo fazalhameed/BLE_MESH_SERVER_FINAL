@@ -60,9 +60,6 @@ This demo mimics a real-world **street lighting system** where:
 
 ## 📲 Tools Required
 
-
-
-
 - [x] **ESP32-DevKitC / ESP32**
 - [x] **ESP-IDF v5.0 or higher**
 - [x] **nRF Mesh App** (Android/iOS)

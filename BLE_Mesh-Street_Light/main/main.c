@@ -4,6 +4,7 @@
 
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "esp_bt.h"
 
 #include "esp_ble_mesh_defs.h"
 #include "esp_ble_mesh_common_api.h"
@@ -12,6 +13,7 @@
 #include "esp_ble_mesh_config_model_api.h"
 #include "esp_ble_mesh_generic_model_api.h"
 #include "esp_ble_mesh_local_data_operation_api.h"
+
 #include "board.h"
 #include "ble_mesh_example_init.h"
 
@@ -19,11 +21,17 @@
 #include "i2c_wrapper.h"
 #include "driver/ledc.h"
 
-#define TAG "EXAMPLE"
+#define TAG "BLE_Mesh"
+
 #define CID_ESP 0x02E5
+
+
+#define ESP_BLE_MESH_VND_MODEL_OP_SEND     ESP_BLE_MESH_MODEL_OP_3(0x00, CID_ESP)
+#define ESP_BLE_MESH_VND_MODEL_OP_STATUS   ESP_BLE_MESH_MODEL_OP_3(0x01, CID_ESP)
 
 extern struct _led_state led_state[3];
 static bool is_node_on = false;  // Global flag to track node ON/OFF
+
 static uint8_t dev_uuid[16] = { 0xdd, 0xdd };
 
 i2c_master_bus_handle_t i2c_bus_handle = NULL;
@@ -48,7 +56,7 @@ static esp_ble_mesh_cfg_srv_t config_server = {
 #endif
     .default_ttl = 7,
 };
-    
+
 ESP_BLE_MESH_MODEL_PUB_DEFINE(onoff_pub_0, 2 + 3, ROLE_NODE);
 static esp_ble_mesh_gen_onoff_srv_t onoff_server_0 = {
     .rsp_ctrl = {
@@ -56,6 +64,7 @@ static esp_ble_mesh_gen_onoff_srv_t onoff_server_0 = {
         .set_auto_rsp = ESP_BLE_MESH_SERVER_AUTO_RSP,
     },
 };
+
 
 ESP_BLE_MESH_MODEL_PUB_DEFINE(onoff_pub_1, 2 + 3, ROLE_NODE);
 static esp_ble_mesh_gen_onoff_srv_t onoff_server_1 = {
@@ -73,6 +82,15 @@ static esp_ble_mesh_gen_onoff_srv_t onoff_server_2 = {
     },
 };
 
+ESP_BLE_MESH_MODEL_PUB_DEFINE(vnd_pub, 2 + 4, ROLE_NODE); 
+static esp_ble_mesh_model_op_t vnd_op[] = {
+    ESP_BLE_MESH_MODEL_OP(ESP_BLE_MESH_VND_MODEL_OP_SEND, 2),
+    ESP_BLE_MESH_MODEL_OP_END,
+};
+
+static esp_ble_mesh_model_t vnd_models[] = {
+    ESP_BLE_MESH_VENDOR_MODEL(CID_ESP, 0x0001, vnd_op, &vnd_pub, NULL),
+};
 static esp_ble_mesh_model_t root_models[] = {
     ESP_BLE_MESH_MODEL_CFG_SRV(&config_server),
     ESP_BLE_MESH_MODEL_GEN_ONOFF_SRV(&onoff_pub_0, &onoff_server_0),
@@ -88,7 +106,8 @@ static esp_ble_mesh_model_t extend_model_1[] = {
 
 static esp_ble_mesh_elem_t elements[] = {
     ESP_BLE_MESH_ELEMENT(0, root_models, ESP_BLE_MESH_MODEL_NONE),
-    ESP_BLE_MESH_ELEMENT(0, extend_model_0, ESP_BLE_MESH_MODEL_NONE),
+   // ESP_BLE_MESH_ELEMENT(0, extend_model_0, ESP_BLE_MESH_MODEL_NONE),
+    ESP_BLE_MESH_ELEMENT(0,  ESP_BLE_MESH_MODEL_NONE, vnd_models),
     ESP_BLE_MESH_ELEMENT(0, extend_model_1, ESP_BLE_MESH_MODEL_NONE),
 };
 
@@ -312,6 +331,31 @@ static void example_ble_mesh_config_server_cb(esp_ble_mesh_cfg_server_cb_event_t
     }
 }
 
+static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event,
+                                             esp_ble_mesh_model_cb_param_t *param)
+{
+    if (event == ESP_BLE_MESH_MODEL_OPERATION_EVT) {
+        /* A vendor operation was received */
+        if (param->model_operation.opcode == ESP_BLE_MESH_VND_MODEL_OP_SEND) {
+            uint16_t tid = 0;
+            if (param->model_operation.length >= 2) {
+                tid = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
+            }
+            ESP_LOGI(TAG, "Vendor op SEND recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
+
+            /* Example: send a vendor status back (echo tid) */
+            esp_err_t err = esp_ble_mesh_server_model_send_msg(param->model_operation.model,
+                param->model_operation.ctx, ESP_BLE_MESH_VND_MODEL_OP_STATUS,
+                sizeof(tid), (uint8_t *)&tid);
+            if (err) {
+                ESP_LOGE(TAG, "Failed to send vendor status (err %d)", err);
+            }
+        }
+    } else if (event == ESP_BLE_MESH_MODEL_SEND_COMP_EVT) {
+        ESP_LOGI(TAG, "Vendor model send complete (err %d)", param->model_send_comp.err_code);
+    }
+}
+
 static esp_err_t ble_mesh_init(void)
 {
     esp_err_t err = ESP_OK;
@@ -319,7 +363,8 @@ static esp_err_t ble_mesh_init(void)
     esp_ble_mesh_register_prov_callback(example_ble_mesh_provisioning_cb);
     esp_ble_mesh_register_config_server_callback(example_ble_mesh_config_server_cb);
     esp_ble_mesh_register_generic_server_callback(example_ble_mesh_generic_server_cb);
-
+    esp_ble_mesh_register_custom_model_callback(example_ble_mesh_vendor_model_cb);
+    
     err = esp_ble_mesh_init(&provision, &composition);
     if (err != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize mesh stack (err %d)", err);

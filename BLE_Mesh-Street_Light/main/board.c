@@ -37,8 +37,7 @@ struct _led_state led_state[3] = {
 
 void board_led_set_brightness(uint32_t duty) {
     // Clamp duty cycle to maximum allowed value
-    if (duty > LED_MAX_DUTY) duty = LED_MAX_DUTY;
-    
+    if (duty > LED_MAX_DUTY) duty = LED_MAX_DUTY; 
     // Update PWM duty cycle and apply changes
     ledc_set_duty(LED_PWM_MODE, LED_PWM_CHANNEL, duty);
     ledc_update_duty(LED_PWM_MODE, LED_PWM_CHANNEL);
@@ -149,10 +148,12 @@ void board_led_operation(uint8_t pin, uint8_t onoff) {
                     vTaskDelete(led_fade_task_handle);
                     led_fade_task_handle = NULL;
                 }
-                board_led_set_brightness(LED_MAX_DUTY);  // Full brightness
+                     ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 1);
+             // board_led_set_brightness(LED_MAX_DUTY);  // Full brightness
             } else {
                 // Turn OFF: Start fade animation instead of instant off
-                board_led_set_brightness(0);
+                 ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 0); // Output LOW
+                    board_led_set_brightness(0);
                 if (led_fade_task_handle == NULL) {
                     xTaskCreate(led_fade_task, "led_fade_task", 2048, NULL, 5, &led_fade_task_handle);
                 }

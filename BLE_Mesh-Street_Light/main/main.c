@@ -337,18 +337,25 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
     if (event == ESP_BLE_MESH_MODEL_OPERATION_EVT) {
         /* A vendor operation was received */
         if (param->model_operation.opcode == ESP_BLE_MESH_VND_MODEL_OP_SEND) {
-            uint16_t tid = 0;
+            uint16_t brightness  = 0;
             if (param->model_operation.length >= 2) {
-                tid = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
+                brightness  = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
             }
-            ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
-
+           // Clamp brightness to 0-1028 (10-bit PWM max)
+                 brightness = (brightness > 1028) ? 1028 : brightness;
+           // ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
+                 ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);
+                
+                // Set LED brightness via PWM
+                board_led_set_brightness(brightness);
             /* Example: send a vendor status back (echo tid) */
-            esp_err_t err = esp_ble_mesh_server_model_send_msg(param->model_operation.model,
-                param->model_operation.ctx, ESP_BLE_MESH_VND_MODEL_OP_STATUS,
-                sizeof(tid), (uint8_t *)&tid);
+            esp_err_t err = esp_ble_mesh_server_model_send_msg(
+                param->model_operation.model,
+                param->model_operation.ctx, 
+                ESP_BLE_MESH_VND_MODEL_OP_STATUS,
+                sizeof(brightness), (uint8_t *)&brightness);
             if (err) {
-                ESP_LOGE(TAG, "Failed to send vendor model status (err %d)", err);
+                ESP_LOGI(TAG, "Invalid brightness message length: %d", param->model_operation.length);
             }
         }
     } else if (event == ESP_BLE_MESH_MODEL_SEND_COMP_EVT) {

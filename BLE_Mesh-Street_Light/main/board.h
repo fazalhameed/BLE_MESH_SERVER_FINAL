@@ -32,8 +32,8 @@ extern "C" {
  */
 #if defined(CONFIG_BLE_MESH_ESP_WROOM_32)
     // ESP32-WROOM-32 configuration
-    #define LED_R GPIO_NUM_4    // Red LED pin
-    #define LED_G GPIO_NUM_4    // Green LED pin (shared with Red)
+    #define LED_R GPIO_NUM_4 // Red LED pin
+    #define LED_G GPIO_NUM_4  // Green LED pin (shared with Red)
     #define LED_B GPIO_NUM_22   // Blue LED pin
   
 #elif defined(CONFIG_BLE_MESH_ESP_WROVER)

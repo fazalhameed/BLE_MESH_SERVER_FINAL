@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <inttypes.h>
-
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_bt.h"
-
 #include "esp_ble_mesh_defs.h"
 #include "esp_ble_mesh_common_api.h"
 #include "esp_ble_mesh_networking_api.h"
@@ -13,10 +11,8 @@
 #include "esp_ble_mesh_config_model_api.h"
 #include "esp_ble_mesh_generic_model_api.h"
 #include "esp_ble_mesh_local_data_operation_api.h"
-
 #include "board.h"
 #include "ble_mesh_example_init.h"
-
 #include "hdc2080.h"
 #include "i2c_wrapper.h"
 #include "driver/ledc.h"
@@ -24,7 +20,6 @@
 #define TAG "BLE_Mesh"
 
 #define CID_ESP 0x02E5
-
 
 #define ESP_BLE_MESH_VND_MODEL_OP_SEND     ESP_BLE_MESH_MODEL_OP_3(0x00, CID_ESP)
 #define ESP_BLE_MESH_VND_MODEL_OP_STATUS   ESP_BLE_MESH_MODEL_OP_3(0x01, CID_ESP)
@@ -65,7 +60,6 @@ static esp_ble_mesh_gen_onoff_srv_t onoff_server_0 = {
     },
 };
 
-
 ESP_BLE_MESH_MODEL_PUB_DEFINE(onoff_pub_1, 2 + 3, ROLE_NODE);
 static esp_ble_mesh_gen_onoff_srv_t onoff_server_1 = {
     .rsp_ctrl = {
@@ -91,6 +85,7 @@ static esp_ble_mesh_model_op_t vnd_op[] = {
 static esp_ble_mesh_model_t vnd_models[] = {
     ESP_BLE_MESH_VENDOR_MODEL(CID_ESP, 0x0001, vnd_op, &vnd_pub, NULL),
 };
+
 static esp_ble_mesh_model_t root_models[] = {
     ESP_BLE_MESH_MODEL_CFG_SRV(&config_server),
     ESP_BLE_MESH_MODEL_GEN_ONOFF_SRV(&onoff_pub_0, &onoff_server_0),
@@ -363,7 +358,6 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
     }
 }
 
-
 static esp_err_t ble_mesh_init(void)
 {
     esp_err_t err = ESP_OK;
@@ -391,7 +385,6 @@ static esp_err_t ble_mesh_init(void)
 
     return err;
 }
-
 
 // void HDC_task(){        
 // float temperature= 0.0f,  humidity = 0.0f;
@@ -427,12 +420,9 @@ static esp_err_t ble_mesh_init(void)
 //         // sprintf(temp_text, "Temp: %.1f C", temperature);
 //         // sprintf(humid_text, "Hum:  %.1f %%", humidity);
 
-    
 //          vTaskDelay(pdMS_TO_TICKS(5000));  // Read every 5 seconds
 //     }
 // }
-
-
 
 void app_main(void)
 {

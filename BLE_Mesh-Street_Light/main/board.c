@@ -41,6 +41,7 @@ struct _led_state led_state[3] = {
 
 void board_led_set_brightness(uint32_t duty) {
     // Clamp duty cycle to maximum allowed value
+    
     if (duty > LED_MAX_DUTY) duty = LED_MAX_DUTY; 
     // Update PWM duty cycle and apply changes
     ledc_set_duty(LED_PWM_MODE, LED_PWM_CHANNEL, duty);

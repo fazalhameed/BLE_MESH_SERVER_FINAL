@@ -86,7 +86,6 @@ static esp_ble_mesh_model_t vnd_models[] = {
     ESP_BLE_MESH_VENDOR_MODEL(CID_ESP, 0x0001, vnd_op, &vnd_pub, NULL),
 };
 
-
 static esp_ble_mesh_model_t root_models[] = {
     ESP_BLE_MESH_MODEL_CFG_SRV(&config_server),
     ESP_BLE_MESH_MODEL_GEN_ONOFF_SRV(&onoff_pub_0, &onoff_server_0),
@@ -237,7 +236,6 @@ static void example_ble_mesh_provisioning_cb(esp_ble_mesh_prov_cb_event_t event,
     }
 }
 
-
 static void example_ble_mesh_generic_server_cb(esp_ble_mesh_generic_server_cb_event_t event,
                                                esp_ble_mesh_generic_server_cb_param_t *param)
 {
@@ -341,10 +339,9 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
                  brightness = (brightness > 1028) ? 1028 : brightness;
            // ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
                  ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);
-                
                 // Set LED brightness via PWM
                 board_led_set_brightness(brightness);
-            /* Example: send a vendor status back (echo tid) */
+            /* v send a vendor status back (echo tid) */
             esp_err_t err = esp_ble_mesh_server_model_send_msg(
                 param->model_operation.model,
                 param->model_operation.ctx, 

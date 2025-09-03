@@ -31,7 +31,7 @@ This BLE Mesh device can be set up as a node with the following features:
 - Sends Generic OnOff Set messages to the server node
 - Also provisioned via the **nRF Mesh app**
 
-### 3. **Demo Flow**
+### 3. Demo Flow
 1. Server node is powered and enters unprovisioned state
 2. Use **nRF Mesh** to provision and bind the server
 3. Configure client node and bind it to the same network

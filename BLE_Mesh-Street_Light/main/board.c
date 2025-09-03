@@ -86,32 +86,32 @@ void pwm_init(void) {
  * Creates smooth breathing effect with multiple cycles
  */
 
-void led_fade_task(void *param) {
+// void led_fade_task(void *param) {
     
-    ESP_LOGI(TAG, "Waiting before fade-in...");
-    vTaskDelay(pdMS_TO_TICKS(2000));  // 2 second startup delay
+//     ESP_LOGI(TAG, "Waiting before fade-in...");
+//     vTaskDelay(pdMS_TO_TICKS(2000));  // 2 second startup delay
 
-    ESP_LOGI(TAG, "Starting fade-in sequence");
-    // Execute multiple fade cycles for breathing effect
-    for (int cycle = 0; cycle < FADE_CYCLES; cycle++) {
-        // Fade up: 0% to 100% brightness over 1 second
-        ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, LED_MAX_DUTY, 1000);
-        ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
+//     ESP_LOGI(TAG, "Starting fade-in sequence");
+//     // Execute multiple fade cycles for breathing effect
+//     for (int cycle = 0; cycle < FADE_CYCLES; cycle++) {
+//         // Fade up: 0% to 100% brightness over 1 second
+//         ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, LED_MAX_DUTY, 1000);
+//         ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
 
-        // Fade down: 100% to 0% brightness over 1 second
-        ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, 0, 1000);
-        ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
-    }
+//         // Fade down: 100% to 0% brightness over 1 second
+//         ledc_set_fade_with_time(LED_PWM_MODE, LED_PWM_CHANNEL, 0, 1000);
+//         ledc_fade_start(LED_PWM_MODE, LED_PWM_CHANNEL, LEDC_FADE_WAIT_DONE);
+//     }
     
-    // Ensure LED is completely off after animation
-    board_led_set_brightness(0);
+//     // Ensure LED is completely off after animation
+//     board_led_set_brightness(0);
 
-    ESP_LOGI(TAG, "Fade sequence complete, LED OFF");
+//     ESP_LOGI(TAG, "Fade sequence complete, LED OFF");
 
-    // Clean up task handle and delete task
-    led_fade_task_handle = NULL;
-    vTaskDelete(NULL);
-}
+//     // Clean up task handle and delete task
+//     led_fade_task_handle = NULL;
+//     vTaskDelete(NULL);
+// }
 
 // ============ LED Control Operations ============
 /**
@@ -142,15 +142,15 @@ void board_led_operation(uint8_t pin, uint8_t onoff) {
                     vTaskDelete(led_fade_task_handle);
                     led_fade_task_handle = NULL;
                 }
-                     ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 1);
-                 //   board_led_set_brightness(LED_MAX_DUTY);  // Full brightness
+                    // ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 1);
+                   board_led_set_brightness(LED_MAX_DUTY);  // Full brightness
             } else {
                 // Turn OFF: Start fade animation instead of instant off
-                 ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 0); // Output LOW
+            //     ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 0); // Output LOW
                  board_led_set_brightness(0);
-                if (led_fade_task_handle == NULL) {
-                    xTaskCreate(led_fade_task, "led_fade_task", 2048, NULL, 5, &led_fade_task_handle);
-                }
+                // if (led_fade_task_handle == NULL) {
+                //     xTaskCreate(led_fade_task, "led_fade_task", 2048, NULL, 5, &led_fade_task_handle);
+                // }
             }
         } else {
             // For non-PWM LEDs (green/blue): use simple GPIO control

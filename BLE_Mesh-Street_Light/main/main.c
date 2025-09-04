@@ -384,43 +384,6 @@ static esp_err_t ble_mesh_init(void)
     return err;
 }
 
-// void HDC_task(){        
-// float temperature= 0.0f,  humidity = 0.0f;
-
-//     esp_err_t err = hdc2080_begin(i2c_bus_handle, &mst_dev_handle, HDC2080_ADDR);
-//     if (err == ESP_OK) {
-//         printf("HDC2080 sensor found\n");
-//     }
-//     else if (err == ESP_ERR_INVALID_RESPONSE) {
-//         printf("HDC2080 sensor not found\n");
-//     }
-//     // hdc2080_reset(mst_dev_handle);  
-//     vTaskDelay(pdMS_TO_TICKS(500));
-//     hdc2080_set_measurement_mode(mst_dev_handle, TEMP_AND_HUMID);
-//     hdc2080_set_rate(mst_dev_handle, MANUAL);
-//     hdc2080_set_temp_resolution(mst_dev_handle, FOURTEEN_BIT);
-//     hdc2080_set_humid_resolution(mst_dev_handle, FOURTEEN_BIT);
-//     hdc2080_trigger_measurement(mst_dev_handle);
-//     vTaskDelay(pdMS_TO_TICKS(100));
-//    while (1) {
-       
-//         // char temp_text[20] = {0};
-//         // char humid_text[20] = {0};
-//         hdc2080_trigger_measurement(mst_dev_handle);  // Ensure a new measurement is taken
-//         vTaskDelay(pdMS_TO_TICKS(100)); // Allow time for measurement
-    
-//         hdc2080_read_temp(mst_dev_handle, &temperature);
-//         hdc2080_read_humidity(mst_dev_handle, &humidity);
-    
-//         printf("Temperature: %.2f °C, Humidity: %.2f\n", temperature, humidity);
-        
-//         //  // Format temperature and humidity
-//         // sprintf(temp_text, "Temp: %.1f C", temperature);
-//         // sprintf(humid_text, "Hum:  %.1f %%", humidity);
-
-//          vTaskDelay(pdMS_TO_TICKS(5000));  // Read every 5 seconds
-//     }
-// }
 
 void app_main(void)
 {
@@ -430,17 +393,7 @@ void app_main(void)
 
     board_init();
     
-    // i2c_master_bus_config_t i2c_mst_config = { 
-	// 	.clk_source = I2C_CLK_SRC_DEFAULT,
-	// 	.glitch_ignore_cnt = 7,
-	// 	.i2c_port = I2C_NUM,
-	// 	.scl_io_num =  22,
-	// 	.sda_io_num =  21,
-	// 	.flags.enable_internal_pullup = true,
-	// };
-   
-	// ESP_ERROR_CHECK(i2c_new_master_bus(&i2c_mst_config, &i2c_bus_handle));
-     
+
     err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
         ESP_ERROR_CHECK(nvs_flash_erase());
@@ -462,9 +415,7 @@ void app_main(void)
         ESP_LOGE(TAG, "Bluetooth mesh init failed (err %d)", err);
     }
     ESP_LOGI(TAG, "Bluetooth Mesh initialized");
-    // HDC_task();
-    // ESP_LOGI(TAG, "HDC2080 task started");
-    
+  
 //     while (1) { 
 //         board_led_operation();
 //         //  for (int duty = 0; duty <= 1023; duty += 64) {

@@ -90,7 +90,7 @@ static esp_ble_mesh_model_t root_models[] = {
     ESP_BLE_MESH_MODEL_CFG_SRV(&config_server),
     ESP_BLE_MESH_MODEL_GEN_ONOFF_SRV(&onoff_pub_0, &onoff_server_0),
 };
-
+   
 static esp_ble_mesh_model_t extend_model_0[] = {
     ESP_BLE_MESH_MODEL_GEN_ONOFF_SRV(&onoff_pub_1, &onoff_server_1),
 };
@@ -112,7 +112,7 @@ static esp_ble_mesh_comp_t composition = {
     .elements = elements,
 };
 
-/* Disable OOB security for SILabs Android app */
+
 static esp_ble_mesh_prov_t provision = {
     .uuid = dev_uuid,
 #if 0
@@ -139,7 +139,7 @@ static void example_change_led_state(esp_ble_mesh_model_t *model,
     uint16_t primary_addr = esp_ble_mesh_get_primary_element_address();
    // uint8_t elem_count = esp_ble_mesh_get_element_count();
     struct _led_state *led = NULL;
-    //uint8_t i;
+    //uint8_t i; 
     
     if (ESP_BLE_MESH_ADDR_IS_UNICAST(ctx->recv_dst)) {
         led = &led_state[model->element->element_addr - primary_addr];
@@ -335,13 +335,10 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
             if (param->model_operation.length >= 2) {
                 brightness  = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
             }
-           // Clamp brightness to 0-1028 (10-bit PWM max)
                  brightness = (brightness > 1028) ? 1028 : brightness;
            // ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
-                 ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);
-                // Set LED brightness via PWM
+                 ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);       
                 board_led_set_brightness(brightness);
-            /* v send a vendor status back (echo tid) */
             esp_err_t err = esp_ble_mesh_server_model_send_msg(
                 param->model_operation.model,
                 param->model_operation.ctx, 

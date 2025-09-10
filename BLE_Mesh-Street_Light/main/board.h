@@ -18,11 +18,15 @@ extern "C" {
 #include "driver/gpio.h"
 
 // PWM configuration for LED control
+#define LED_MAX_DUTY       1023       // Max duty cycle for 10-bit PWM resolution
 #define LED_PWM_FREQ       5000                         // PWM frequency: 5 kHz
 #define LED_PWM_RESOLUTION LEDC_TIMER_10_BIT            // PWM resolution: 10-bit
 #define LED_PWM_CHANNEL    LEDC_CHANNEL_0               // PWM channel 0
 #define LED_PWM_TIMER      LEDC_TIMER_0                 // PWM timer 0
 #define LED_PWM_MODE       LEDC_LOW_SPEED_MODE          // PWM mode: low speed
+
+#define LDR_ADC_CHANNEL   ADC1_CHANNEL_7   // GPIO5 → ADC1_CH0
+#define LDR_THRESHOLD     2000             // Adjust experimentally (0-4095)
 
 /**
  * @brief Board-specific LED pin configuration

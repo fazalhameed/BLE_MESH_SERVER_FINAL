@@ -12,19 +12,16 @@
 
 #define TAG "BOARD"
 
-
-
 // PWM configuration constants
-#define LED_MAX_DUTY       1023       // Max duty cycle for 10-bit PWM resolution
-#define FADE_STEP          8          // PWM increment/decrement step size
-#define FADE_DELAY_MS      10         // Milliseconds between fade steps
-#define FADE_CYCLES        6          // Number of complete fade in/out cycles
+
+//#define FADE_STEP          8          // PWM increment/decrement step size
+//#define FADE_DELAY_MS      10         // Milliseconds between fade steps
+//#define FADE_CYCLES        6          // Number of complete fade in/out cycles
 
 // Task handle for LED fade animation
 static TaskHandle_t led_fade_task_handle = NULL;
 
 // ============= LED State Management ===============
-// Array to track state of RGB LEDs (red, green, blue)
 
 struct _led_state led_state[3] = {
     { LED_OFF, LED_OFF, LED_R, "red"   },    // Red LED state
@@ -178,7 +175,38 @@ static void board_led_init(void) {
         led_state[i].previous = LED_OFF;                         // Update state tracking
     }
 }
+// ============== LDR Functions =====================
+static void ldr_init(void) {
+    adc1_config_width(ADC_WIDTH_BIT_12);  // 0–4095
+    adc1_config_channel_atten(LDR_ADC_CHANNEL, ADC_ATTEN_DB_11); // 0–3.3V
+   // ESP_LOGI(TAG, "LDR on GPIO5 initialized");
+}
 
+static int ldr_read(void) {
+    int val = adc1_get_raw(LDR_ADC_CHANNEL);
+   //ESP_LOGI(TAG, "LDR raw value: %d", val);
+    return val;
+}
+
+static void ldr_task(void *arg) {
+    while (1) {
+        int ldr_val = ldr_read();
+
+        if (ldr_val > LDR_THRESHOLD) {
+            // Bright → LEDs OFF
+            board_led_operation(LED_R, 0);
+           // board_led_operation(LED_G, 0);
+           // board_led_operation(LED_B, 0);
+        } else {
+            // Dark → LEDs ON
+            board_led_operation(LED_R, 1);
+          //  board_led_operation(LED_G, 1);
+          //  board_led_operation(LED_B, 1);
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(1000)); // every 1 sec
+    }
+}
 
 // =========== Board Initialization ============
 /**
@@ -189,6 +217,7 @@ static void board_led_init(void) {
 void board_init(void) {
     board_led_init();  // Initialize LED GPIO pins
     pwm_init();        // Initialize PWM for brightness control
-
+  // Start LDR monitoring task
+    xTaskCreate(ldr_task, "ldr_task", 2048, NULL, 5, NULL);
 }
 // ===================== END ====================

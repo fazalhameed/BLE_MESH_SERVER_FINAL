@@ -12,14 +12,12 @@
 
 #define TAG "BOARD"
 
-// PWM configuration constants
-
 //#define FADE_STEP          8          // PWM increment/decrement step size
 //#define FADE_DELAY_MS      10         // Milliseconds between fade steps
 //#define FADE_CYCLES        6          // Number of complete fade in/out cycles
 
 // Task handle for LED fade animation
-static TaskHandle_t led_fade_task_handle = NULL;
+//static TaskHandle_t led_fade_task_handle = NULL;
 
 // ============= LED State Management ===============
 
@@ -30,11 +28,6 @@ struct _led_state led_state[3] = {
 };
 
 // =========== PWM Brightness Control ============
-/**
- * @brief Set LED brightness using PWM duty cycle
- * @param duty PWM duty cycle (0-1023 for 10-bit resolution)
- */
-
 void board_led_set_brightness(uint32_t duty) {
     // Clamp duty cycle to maximum allowed value
     
@@ -45,14 +38,9 @@ void board_led_set_brightness(uint32_t duty) {
 }
 
 // ================= PWM Setup =================
-/**
- * @brief Initialize LEDC PWM for LED brightness control
- * Configures timer and channel for smooth LED dimming
- */
-
 void pwm_init(void) {
     ESP_LOGI(TAG, "Configuring LEDC timer and channel");
-    // Configure LEDC timer for PWM generation
+  
     ledc_timer_config_t ledc_timer = {
         .speed_mode       = LED_PWM_MODE,        // High-speed mode
         .timer_num        = LED_PWM_TIMER,       // Timer selection
@@ -61,7 +49,7 @@ void pwm_init(void) {
         .clk_cfg          = LEDC_AUTO_CLK        // Auto clock selection
     };
     ledc_timer_config(&ledc_timer);
-    // Configure LEDC channel for red LED
+  
     ledc_channel_config_t ledc_channel = {
         .gpio_num       = LED_R,            // Red LED GPIO pin
         .speed_mode     = LED_PWM_MODE,     // Match timer speed mode
@@ -73,16 +61,11 @@ void pwm_init(void) {
     ledc_channel_config(&ledc_channel);
 
     // Install fade function for smooth transitions
-    ledc_fade_func_install(0);
+  //  ledc_fade_func_install(0);
     ESP_LOGI(TAG, "PWM initialized on GPIO %d", LED_R);
 }
 
 // ============== Fade Animation Task ==============
-/**
- * @brief FreeRTOS task for LED fade in/out animation
- * Creates smooth breathing effect with multiple cycles
- */
-
 // void led_fade_task(void *param) {
     
 //     ESP_LOGI(TAG, "Waiting before fade-in...");
@@ -111,12 +94,6 @@ void pwm_init(void) {
 // }
 
 // ============ LED Control Operations ============
-/**
- * @brief Control LED on/off state with PWM support for red LED
- * @param pin GPIO pin number of the LED to control
- * @param onoff LED state: 1=ON, 0=OFF
- */
-
 void board_led_operation(uint8_t pin, uint8_t onoff) {
     // Find LED in state array
     for (int i = 0; i < 3; i++) {
@@ -135,10 +112,10 @@ void board_led_operation(uint8_t pin, uint8_t onoff) {
         if (pin == LED_R) {
             if (onoff) {
                 // Turn ON: Cancel any running fade and set full brightness
-                if (led_fade_task_handle != NULL) {
-                    vTaskDelete(led_fade_task_handle);
-                    led_fade_task_handle = NULL;
-                }
+                // if (led_fade_task_handle != NULL) {
+                //     vTaskDelete(led_fade_task_handle);
+                //     led_fade_task_handle = NULL;
+                // }
                     // ledc_stop(LED_PWM_MODE, LED_PWM_CHANNEL, 1);
                    board_led_set_brightness(LED_MAX_DUTY);  // Full brightness
             } else {
@@ -161,11 +138,6 @@ void board_led_operation(uint8_t pin, uint8_t onoff) {
 }
 
 // ============== LED Initialization ===============
-/**
- * @brief Initialize all GPIO pins for LED control
- * Sets up red, green, and blue LEDs as outputs in OFF state
- */
-
 static void board_led_init(void) {
     // Configure each LED pin as output and set initial state
     for (int i = 0; i < 3; i++) {
@@ -177,15 +149,13 @@ static void board_led_init(void) {
 }
 // ============== LDR Functions =====================
 static void ldr_init(void) {
-    adc1_config_width(ADC_WIDTH_BIT_12);  // 0–4095
-    adc1_config_channel_atten(LDR_ADC_CHANNEL, ADC_ATTEN_DB_11); // 0–3.3V
-   // ESP_LOGI(TAG, "LDR on GPIO5 initialized");
+    adc1_config_width(ADC_WIDTH_BIT_12); 
+    adc1_config_channel_atten(LDR_ADC_CHANNEL, ADC_ATTEN_DB_11); 
+  
 }
 
 static int ldr_read(void) {
-    int val = adc1_get_raw(LDR_ADC_CHANNEL);
-   //ESP_LOGI(TAG, "LDR raw value: %d", val);
-    return val;
+   return adc1_get_raw(LDR_ADC_CHANNEL);
 }
 
 static void ldr_task(void *arg) {
@@ -207,13 +177,7 @@ static void ldr_task(void *arg) {
         vTaskDelay(pdMS_TO_TICKS(1000)); // every 1 sec
     }
 }
-
 // =========== Board Initialization ============
-/**
- * @brief Initialize all board peripherals
- * Sets up LEDs and PWM functionality
- */
-
 void board_init(void) {
     board_led_init();  // Initialize LED GPIO pins
     pwm_init();        // Initialize PWM for brightness control

@@ -12,11 +12,6 @@
 
 #define TAG "BOARD"
 
-//#define FADE_STEP          8          // PWM increment/decrement step size
-//#define FADE_DELAY_MS      10         // Milliseconds between fade steps
-//#define FADE_CYCLES        6          // Number of complete fade in/out cycles
-
-// Task handle for LED fade animation
 //static TaskHandle_t led_fade_task_handle = NULL;
 
 // ============= LED State Management ===============
@@ -60,7 +55,7 @@ void pwm_init(void) {
     };
     ledc_channel_config(&ledc_channel);
 
-    // Install fade function for smooth transitions
+   
   //  ledc_fade_func_install(0);
     ESP_LOGI(TAG, "PWM initialized on GPIO %d", LED_R);
 }

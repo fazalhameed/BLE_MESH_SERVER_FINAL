@@ -3,6 +3,7 @@
 #include <inttypes.h>
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include "nvs.h"
 #include "esp_bt.h"
 #include "esp_ble_mesh_defs.h"
 #include "esp_ble_mesh_common_api.h"
@@ -111,7 +112,6 @@ static esp_ble_mesh_comp_t composition = {
     .element_count = ARRAY_SIZE(elements),
     .elements = elements,
 };
-
 
 static esp_ble_mesh_prov_t provision = {
     .uuid = dev_uuid,
@@ -381,7 +381,6 @@ static esp_err_t ble_mesh_init(void)
     return err;
 }
 
-
 void app_main(void)
 {
     esp_err_t err;
@@ -427,3 +426,5 @@ void app_main(void)
 //    }
     
 }
+
+

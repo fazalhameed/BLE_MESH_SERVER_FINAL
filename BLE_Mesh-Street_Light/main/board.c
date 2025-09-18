@@ -24,9 +24,8 @@ struct _led_state led_state[3] = {
 
 // =========== PWM Brightness Control ============
 void board_led_set_brightness(uint32_t duty) {
-    // Clamp duty cycle to maximum allowed value
-    
     if (duty > LED_MAX_DUTY) duty = LED_MAX_DUTY; 
+    
     // Update PWM duty cycle and apply changes
     ledc_set_duty(LED_PWM_MODE, LED_PWM_CHANNEL, duty);
     ledc_update_duty(LED_PWM_MODE, LED_PWM_CHANNEL);
@@ -34,7 +33,7 @@ void board_led_set_brightness(uint32_t duty) {
 
 // ================= PWM Setup =================
 void pwm_init(void) {
-    ESP_LOGI(TAG, "Configuring LEDC timer and channel");
+   // ESP_LOGI(TAG, "Configuring LEDC timer and channel");
   
     ledc_timer_config_t ledc_timer = {
         .speed_mode       = LED_PWM_MODE,        // High-speed mode
@@ -55,9 +54,8 @@ void pwm_init(void) {
     };
     ledc_channel_config(&ledc_channel);
 
-   
   //  ledc_fade_func_install(0);
-    ESP_LOGI(TAG, "PWM initialized on GPIO %d", LED_R);
+   // ESP_LOGI(TAG, "PWM initialized on GPIO %d", LED_R);
 }
 
 // ============== Fade Animation Task ==============
@@ -146,7 +144,6 @@ static void board_led_init(void) {
 static void ldr_init(void) {
     adc1_config_width(ADC_WIDTH_BIT_12); 
     adc1_config_channel_atten(LDR_ADC_CHANNEL, ADC_ATTEN_DB_11); 
-  
 }
 
 static int ldr_read(void) {
@@ -168,7 +165,6 @@ static void ldr_task(void *arg) {
           //  board_led_operation(LED_G, 1);
           //  board_led_operation(LED_B, 1);
         }
-
         vTaskDelay(pdMS_TO_TICKS(1000)); // every 1 sec
     }
 }
@@ -176,7 +172,8 @@ static void ldr_task(void *arg) {
 void board_init(void) {
     board_led_init();  // Initialize LED GPIO pins
     pwm_init();        // Initialize PWM for brightness control
+
   // Start LDR monitoring task
     xTaskCreate(ldr_task, "ldr_task", 2048, NULL, 5, NULL);
 }
-// ===================== END ====================
+// ===================== END ====================           

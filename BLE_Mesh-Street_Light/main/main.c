@@ -3,7 +3,6 @@
 #include <inttypes.h>
 #include "esp_log.h"
 #include "nvs_flash.h"
-#include "nvs.h"
 #include "esp_bt.h"
 #include "esp_ble_mesh_defs.h"
 #include "esp_ble_mesh_common_api.h"
@@ -17,8 +16,9 @@
 #include "hdc2080.h"
 #include "i2c_wrapper.h"
 #include "driver/ledc.h"
-
+  
 #define TAG "BLE_Mesh"
+#define STORAGE_NAMESPACE "mesh_store"
 
 #define CID_ESP 0x02E5
 
@@ -27,6 +27,7 @@
 
 extern struct _led_state led_state[3];
 static bool is_node_on = false;  // Global flag to track node ON/OFF
+static uint16_t saved_brightness = 512; // Default mid-level brightness
 
 static uint8_t dev_uuid[16] = { 0xdd, 0xdd };
 
@@ -196,6 +197,7 @@ static void example_handle_gen_onoff_msg(esp_ble_mesh_model_t *model,
         esp_ble_mesh_model_publish(model, ESP_BLE_MESH_MODEL_OP_GEN_ONOFF_STATUS,
             sizeof(srv->state.onoff), &srv->state.onoff, ROLE_NODE);
         example_change_led_state(model, ctx, srv->state.onoff);
+  
         break;
     default:
         break;
@@ -325,6 +327,7 @@ static void example_ble_mesh_config_server_cb(esp_ble_mesh_cfg_server_cb_event_t
     }
 }
 
+
 static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event,
                                              esp_ble_mesh_model_cb_param_t *param)
 {
@@ -336,9 +339,9 @@ static void example_ble_mesh_vendor_model_cb(esp_ble_mesh_model_cb_event_t event
                 brightness  = (param->model_operation.msg[0] << 8) | param->model_operation.msg[1];
             }
                  brightness = (brightness > 1028) ? 1028 : brightness;
-           // ESP_LOGI(TAG, "Vendor op SEND Recv, tid 0x%04x, src 0x%04x", tid, param->model_operation.ctx->addr);
-                 ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);       
-                board_led_set_brightness(brightness);
+        
+                ESP_LOGI(TAG, "Set LED brightness: %d/1028", brightness);       
+              //  board_led_set_brightness(brightness);
             esp_err_t err = esp_ble_mesh_server_model_send_msg(
                 param->model_operation.model,
                 param->model_operation.ctx, 
@@ -381,14 +384,13 @@ static esp_err_t ble_mesh_init(void)
     return err;
 }
 
-void app_main(void)
+void app_main(void) 
 {
     esp_err_t err;
 
     ESP_LOGI(TAG, "Initializing...");
-
-    board_init();
-    
+   board_init();
+   
 
     err = nvs_flash_init();
     if (err == ESP_ERR_NVS_NO_FREE_PAGES) {
@@ -398,6 +400,7 @@ void app_main(void)
     ESP_ERROR_CHECK(err);
 
     err = bluetooth_init();
+
     if (err) {
         ESP_LOGE(TAG, "esp32_bluetooth_init failed (err %d)", err);
         return;
@@ -412,6 +415,7 @@ void app_main(void)
     }
     ESP_LOGI(TAG, "Bluetooth Mesh initialized");
   
+
 //     while (1) { 
 //         board_led_operation();
 //         //  for (int duty = 0; duty <= 1023; duty += 64) {
